@@ -1,0 +1,48 @@
+// Creager 참조테이블: D20(mm) → Ks(cm/sec)
+// D20 기준 내림차순 정렬
+export const CREAGER_TABLE: { d20: number; classification: string; ks: number }[] = [
+  { d20: 2.0, classification: '잔자갈', ks: 1.8 },
+  { d20: 1.0, classification: '조립모래', ks: 0.36 },
+  { d20: 0.9, classification: '조립모래', ks: 0.28 },
+  { d20: 0.8, classification: '조립모래', ks: 0.215 },
+  { d20: 0.7, classification: '조립모래', ks: 0.16 },
+  { d20: 0.6, classification: '조립모래', ks: 0.11 },
+  { d20: 0.5, classification: '중립모래', ks: 0.075 },
+  { d20: 0.45, classification: '중립모래', ks: 0.058 },
+  { d20: 0.4, classification: '중립모래', ks: 0.045 },
+  { d20: 0.35, classification: '중립모래', ks: 0.032 },
+  { d20: 0.3, classification: '중립모래', ks: 0.022 },
+  { d20: 0.25, classification: '세립모래', ks: 0.014 },
+  { d20: 0.2, classification: '세립모래', ks: 0.0089 },
+  { d20: 0.18, classification: '세립모래', ks: 0.00685 },
+  { d20: 0.16, classification: '세립모래', ks: 0.0051 },
+  { d20: 0.14, classification: '세립모래', ks: 0.0038 },
+  { d20: 0.12, classification: '세립모래', ks: 0.0026 },
+  { d20: 0.1, classification: '매우 세립모래', ks: 0.00175 },
+  { d20: 0.09, classification: '매우 세립모래', ks: 0.0014 },
+  { d20: 0.08, classification: '매우 세립모래', ks: 0.0009 },
+  { d20: 0.07, classification: '매우 세립모래', ks: 0.00065 },
+  { d20: 0.06, classification: '매우 세립모래', ks: 0.00046 },
+  { d20: 0.05, classification: '조립실트', ks: 0.00028 },
+  { d20: 0.04, classification: '조립실트', ks: 0.000175 },
+  { d20: 0.03, classification: '조립실트', ks: 0.000085 },
+  { d20: 0.02, classification: '조립실트', ks: 0.00004 },
+  { d20: 0.01, classification: '세립 실트', ks: 0.0000105 },
+  { d20: 0.005, classification: '점토', ks: 0.000003 },
+];
+
+// USBR 참조테이블: USCS 분류 → Ks(cm/sec)
+export const USBR_TABLE: { uscs: string; ks: number }[] = [
+  { uscs: 'GW', ks: 0.05 },
+  { uscs: 'GP', ks: 0.04 },
+  { uscs: 'GM', ks: 0.0075 },
+  { uscs: 'GC', ks: 0.0085 },
+  { uscs: 'SW', ks: 0.006 },
+  { uscs: 'SP', ks: 0.02 },
+  { uscs: 'SM', ks: 0.001 },
+  { uscs: 'SC', ks: 0.00001 },
+  { uscs: 'ML', ks: 0.00006 },
+  { uscs: 'CL', ks: 0.00001 },
+  { uscs: 'MH', ks: 0.00000085 },
+  { uscs: 'CH', ks: 0.000006 },
+];
