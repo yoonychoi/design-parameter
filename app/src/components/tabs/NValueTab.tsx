@@ -3,12 +3,19 @@ import { useProject } from '../../state/useProject';
 import { calculateLayerSummaries } from '../../calculations/nValue';
 import { Plus, Trash2 } from 'lucide-react';
 import {
-  Chart as ChartJS, CategoryScale, LinearScale, PointElement,
-  LineElement, Title, Tooltip, Legend,
+  Chart as ChartJS, LinearScale, PointElement,
+  Title, Tooltip, Legend, ScatterController,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Scatter } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(ScatterController, LinearScale, PointElement, Title, Tooltip, Legend);
+
+// 지층별 색상 팔레트
+const LAYER_COLORS = [
+  '#3b82f6', '#ef4444', '#10b981', '#f59e0b',
+  '#8b5cf6', '#ec4899', '#06b6d4', '#f97316',
+  '#84cc16', '#6366f1', '#14b8a6', '#f43f5e',
+];
 
 export default function NValueTab() {
   const { state, dispatch } = useProject();
@@ -30,26 +37,55 @@ export default function NValueTab() {
     setNewBhName('');
   };
 
-  // 차트 데이터: 전체 시추공의 심도별 N값
-  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+  // 차트 데이터: 지층별 분산형 — 전체 시추공 측정값을 지층으로 그룹핑
   const chartData = {
-    datasets: state.boreholes.map((bh, i) => ({
-      label: bh.name,
-      data: bh.measurements.map((m) => ({ x: m.nValue, y: m.depth })),
-      borderColor: colors[i % colors.length],
-      backgroundColor: colors[i % colors.length],
-      pointRadius: 4,
-      showLine: true,
-      tension: 0,
-    })),
+    datasets: state.layers.map((layer, i) => {
+      const points: { x: number; y: number }[] = [];
+      for (const bh of state.boreholes) {
+        for (const m of bh.measurements) {
+          if (m.layerId === layer.id) {
+            points.push({ x: m.nValue, y: m.depth });
+          }
+        }
+      }
+      const color = LAYER_COLORS[i % LAYER_COLORS.length];
+      return {
+        label: layer.name,
+        data: points,
+        backgroundColor: color,
+        borderColor: color,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      };
+    }).filter((d) => d.data.length > 0),
   };
+
   const chartOptions = {
     responsive: true,
     scales: {
-      y: { type: 'linear' as const, reverse: true, title: { display: true, text: '심도 (m)' } },
-      x: { type: 'linear' as const, title: { display: true, text: 'N값' }, min: 0 },
+      y: {
+        type: 'linear' as const,
+        reverse: true,
+        title: { display: true, text: '심도 (m)' },
+        grid: { color: '#e5e7eb' },
+      },
+      x: {
+        type: 'linear' as const,
+        title: { display: true, text: 'N값' },
+        min: 0,
+        grid: { color: '#e5e7eb' },
+      },
     },
-    plugins: { title: { display: true, text: '심도별 N값 분포' } },
+    plugins: {
+      title: { display: true, text: '심도별 N값 분포 (지층별)', font: { size: 14 } },
+      legend: { position: 'right' as const },
+      tooltip: {
+        callbacks: {
+          label: (ctx: import('chart.js').TooltipItem<'scatter'>) =>
+            `${ctx.dataset.label}: 심도 ${ctx.parsed.y}m, N=${ctx.parsed.x}`,
+        },
+      },
+    },
   };
 
   return (
@@ -216,7 +252,7 @@ export default function NValueTab() {
           </div>
 
           <div className="border rounded-lg p-4">
-            <Line data={chartData} options={chartOptions} />
+            <Scatter data={chartData} options={chartOptions} />
           </div>
         </div>
       )}
