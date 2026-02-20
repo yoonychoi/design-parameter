@@ -66,6 +66,7 @@ export default function NValueTab() {
       y: {
         type: 'linear' as const,
         reverse: true,
+        min: 0,
         title: { display: true, text: '심도 (m)' },
         grid: { color: '#e5e7eb' },
       },
@@ -77,7 +78,7 @@ export default function NValueTab() {
       },
     },
     plugins: {
-      title: { display: true, text: '심도별 N값 분포 (지층별)', font: { size: 14 } },
+      title: { display: false },
       legend: { position: 'right' as const },
       tooltip: {
         callbacks: {
