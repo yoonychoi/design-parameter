@@ -18,6 +18,16 @@ function genId() {
   return String(nextId++);
 }
 
+// 불러온 상태의 ID들과 충돌하지 않도록 카운터 재설정
+export function syncNextId(state: ProjectState) {
+  const allIds = [
+    ...state.layers.map((l) => l.id),
+    ...state.boreholes.map((b) => b.id),
+    ...state.boreholes.flatMap((b) => b.measurements.map((m) => m.id)),
+  ].map(Number).filter((n) => !isNaN(n));
+  if (allIds.length > 0) nextId = Math.max(...allIds) + 1;
+}
+
 function toMap<T extends { layerId: string }>(arr: T[]): Map<string, T> {
   const m = new Map<string, T>();
   for (const item of arr) m.set(item.layerId, item);
@@ -437,6 +447,11 @@ export function projectReducer(state: ProjectState, action: Action): ProjectStat
           f.layerId === action.layerId ? { ...f, unitWeight: action.unitWeight } : f
         ),
       };
+    }
+
+    case 'LOAD_STATE': {
+      syncNextId(action.payload);
+      return { ...action.payload };
     }
 
     default:

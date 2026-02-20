@@ -28,4 +28,6 @@ export type Action =
   // Permeability
   | { type: 'UPDATE_PERMEABILITY_INPUT'; layerId: string; appliedValue?: number; d10?: number | null; d20?: number | null; fieldTest?: number | null; nearbyData?: number | null; applyMode?: ApplyMode }
   // FinalSummary
-  | { type: 'UPDATE_UNIT_WEIGHT'; layerId: string; unitWeight: number | null };
+  | { type: 'UPDATE_UNIT_WEIGHT'; layerId: string; unitWeight: number | null }
+  // Project persistence
+  | { type: 'LOAD_STATE'; payload: import('../types').ProjectState };

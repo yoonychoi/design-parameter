@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useProject } from './state/useProject';
 import NValueTab from './components/tabs/NValueTab';
 import FrictionAngleTab from './components/tabs/FrictionAngleTab';
@@ -7,7 +8,8 @@ import SubgradeTab from './components/tabs/SubgradeTab';
 import AnchorTab from './components/tabs/AnchorTab';
 import PermeabilityTab from './components/tabs/PermeabilityTab';
 import SummaryTab from './components/tabs/SummaryTab';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, FolderOpen } from 'lucide-react';
+import type { ProjectState } from './types';
 
 const TABS = [
   { label: 'N값 분포', component: NValueTab },
@@ -24,12 +26,63 @@ export default function App() {
   const { state, dispatch } = useProject();
   const activeTab = state.activeTab;
   const ActiveComponent = TABS[activeTab].component;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 프로젝트 저장 (JSON 다운로드)
+  const handleSave = () => {
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `설계지반정수_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // 프로젝트 불러오기 (JSON 파일 선택)
+  const handleLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const loaded = JSON.parse(ev.target?.result as string) as ProjectState;
+        dispatch({ type: 'LOAD_STATE', payload: loaded });
+      } catch {
+        alert('파일을 읽는 중 오류가 발생했습니다. 올바른 프로젝트 파일인지 확인해주세요.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // 같은 파일 재선택 허용
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
       <header className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800">설계지반정수 산정 프로그램</h1>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={handleLoad}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded border border-gray-300 hover:bg-gray-50 text-gray-600"
+            >
+              <FolderOpen size={15} /> 불러오기
+            </button>
+            <button
+              onClick={handleSave}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              <Save size={15} /> 저장
+            </button>
+          </div>
         </div>
       </header>
 
